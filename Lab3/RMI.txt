@@ -1,0 +1,57 @@
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+SERVER
+
+public interface CalculatorInterface extends Remote {
+    int add(int a, int b) throws RemoteException;
+}
+
+
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class CalculatorServer extends UnicastRemoteObject implements CalculatorInterface {
+
+    public CalculatorServer() throws RemoteException {
+        super();
+    }
+
+    @Override
+    public int add(int a, int b) throws RemoteException {
+        return a + b;
+    }
+
+    public static void main(String[] args) {
+        try {
+            Naming.rebind("rmi://localhost/CalculatorService", new CalculatorServer());
+            System.out.println("Calculator Server is ready.");
+        } catch (Exception e) {
+            System.out.println("Server failed: " + e);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+client:
+
+import java.rmi.Naming;
+
+public class CalculatorClient {
+    public static void main(String[] args) {
+        try {
+            CalculatorInterface calculator = (CalculatorInterface) Naming.lookup("rmi://localhost/CalculatorService");
+            int result = calculator.add(5, 3);
+            System.out.println("The sum is: " + result);
+        } catch (Exception e) {
+            System.out.println("Client exception: " + e);
+        }
+    }
+}
